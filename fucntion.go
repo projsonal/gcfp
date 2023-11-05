@@ -6,10 +6,11 @@ import (
 
     "github.com/GoogleCloudPlatform/functions-framework-go/functions"
     "github.com/PakArbi/pasetobackend"
+    // "github.com/PakArbi/backendUser"
 )
 
 func init() {
-    functions.HTTP("pakArbi", pasetoProPost)
+    functions.HTTP("pasetoProPost", pasetoProPost)
 }
 
 func pasetoProPost(w http.ResponseWriter, r *http.Request) {
@@ -24,6 +25,6 @@ func pasetoProPost(w http.ResponseWriter, r *http.Request) {
     }
     // Set CORS headers for the main request.
     w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io")
-    fmt.Fprintf(w, pasetobackend.GCFPasetoTokenStr("privateKey", "MONGOVER", "pakArbi", "user", r))
+    fmt.Fprintf(w, pasetobackend.GCFPasetoTokenStr("privateKey", "MONGOVER", "pasetoProPost", "user", r))
 
 }
