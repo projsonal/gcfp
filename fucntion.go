@@ -10,10 +10,10 @@ import (
 )
 
 func init() {
-    functions.HTTP("pasetoProPost", pasetoProPost)
+    functions.HTTP("GetDataUserFromGCF", GetDataUserFromGCF)
 }
 
-func pasetoProPost(w http.ResponseWriter, r *http.Request) {
+func GetDataUserFromGCF(w http.ResponseWriter, r *http.Request) {
     // Set CORS headers for the preflight request
     if r.Method == http.MethodOptions {
         w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io")
@@ -25,6 +25,6 @@ func pasetoProPost(w http.ResponseWriter, r *http.Request) {
     }
     // Set CORS headers for the main request.
     w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io")
-    fmt.Fprintf(w, pasetobackend.GCFPasetoTokenStr("privateKey", "MONGOVER", "pasetoProPost", "user", r))
+    fmt.Fprintf(w, pasetobackend.GCFPasetoTokenStr("privateKey", "MONGOVER", "GetDataUserFromGCF", "GetDataUserFromGCF", r))
 
 }
