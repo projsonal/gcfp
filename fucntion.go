@@ -6,14 +6,13 @@ import (
 
     "github.com/GoogleCloudPlatform/functions-framework-go/functions"
     "github.com/PakArbi/pasetobackend"
-    // "github.com/PakArbi/backendUser"
 )
 
 func init() {
-    functions.HTTP("GetDataUserFromGCF", GetDataUserFromGCF)
+    functions.HTTP("Users", PostHandler)
 }
 
-func GetDataUserFromGCF(w http.ResponseWriter, r *http.Request) {
+func PostHandler(w http.ResponseWriter, r *http.Request) {
     // Set CORS headers for the preflight request
     if r.Method == http.MethodOptions {
         w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io")
@@ -25,6 +24,6 @@ func GetDataUserFromGCF(w http.ResponseWriter, r *http.Request) {
     }
     // Set CORS headers for the main request.
     w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io")
-    fmt.Fprintf(w, pasetobackend.GCFPasetoTokenStr("privateKey", "MONGOVER", "GetDataUserFromGCF", "GetDataUserFromGCF", r))
+    fmt.Fprintf(w, pasetobackend.GCFPostHandler("PASETOPRIVATEKEYENV","MONGOSTRINGENV", "PakArbi", "Users", r))
 
 }
