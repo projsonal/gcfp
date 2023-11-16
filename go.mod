@@ -10,6 +10,7 @@ require (
 require (
 	aidanwoods.dev/go-paseto v1.5.0 // indirect
 	aidanwoods.dev/go-result v0.1.0 // indirect
+	github.com/GilarYa/backendgis4 v0.0.2 // indirect
 	github.com/aiteung/atdb v0.1.3 // indirect
 	github.com/cloudevents/sdk-go/v2 v2.14.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
@@ -23,6 +24,8 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
+	github.com/nugisOrange/backendgcf v0.0.3 // indirect
+	github.com/nugisOrange/petback v0.0.3 // indirect
 	github.com/whatsauth/watoken v0.1.3 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
