@@ -114,3 +114,35 @@ func CodeQR(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, backparkir.GCFPostParkiran("MONGOCONNSTRINGENV", "PakArbi", "CodeQR", r))
 
 }
+
+
+// UPDATE DATA PARKIRAN
+package gcf
+
+import (
+    "fmt"
+    "net/http"
+
+    "github.com/GoogleCloudPlatform/functions-framework-go/functions"
+    "github.com/PakArbi/pakarbibackend"
+)
+
+func init() {
+    functions.HTTP("updateDataParkiran", backGCFkPost)
+}
+
+func backGCFkPost(w http.ResponseWriter, r *http.Request) {
+    // Set CORS headers for the preflight request
+    if r.Method == http.MethodOptions {
+        w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io, https://pakarbi.vaidiq.cloud")
+        w.Header().Set("Access-Control-Allow-Methods", "PUT")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type,Authorization,Token")
+        w.Header().Set("Access-Control-Max-Age", "3600")
+        w.WriteHeader(http.StatusNoContent)
+        return
+    }
+    // Set CORS headers for the main request.
+    w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io,https://pakarbi.vaidiq.cloud")
+    fmt.Fprintf(w, pakarbibackend.GCFUUpdateParkiranNPM("publickey", "MONGOCONNSTRINGENV", "PakArbiApp", "user", "parkiran", r))
+
+}
