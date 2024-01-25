@@ -60,7 +60,7 @@ import (
     "net/http"
 
     "github.com/GoogleCloudPlatform/functions-framework-go/functions"
-    "github.com/PakArbi/backparkir"
+    "github.com/PakArbi/pakarbibackend"
 )
 
 func init() {
@@ -80,9 +80,71 @@ func PostParkiran(w http.ResponseWriter, r *http.Request) {
 	// Set CORS headers for the main request.
 	w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io, https://pakarbi.vaidiq.cloud")
 	w.Header().Add("Content-Type", "application/json")
-	fmt.Fprintf(w, backparkir.GCFPostParkiran("MONGOSTRINGENV", "PakArbi", "CodeQR", "r" ))
+	response := goqrcode.GCFGenerate("MONGOCONNSTRINGENV", "PakArbiApp", "CodeQR", w, r)
+	fmt.Fprintf(w, response)
+}
+
+package gcf
+
+import (
+	"fmt"
+	"github.com/PakArbi/pakarbibackend"
+	"net/http"
+
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+)
+
+func init() {
+	functions.HTTP("postCodeQR", PostParkiran)
+}
+
+func PostParkiran(w http.ResponseWriter, r *http.Request) {
+	// Set CORS headers for the preflight request
+	if r.Method == http.MethodOptions {
+		w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io, https://pakarbi.vaidiq.cloud")
+		w.Header().Set("Access-Control-Allow-Methods", "POST")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,Authorization, Token, Login")
+		w.Header().Set("Access-Control-Max-Age", "3600")
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+	// Set CORS headers for the main request.
+	w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io, https://pakarbi.vaidiq.cloud")
+	w.Header().Add("Content-Type", "application/json")
+	fmt.Fprintf(w, pakarbibackend.GCFInsertParkiranEmail("MONGOCONNSTRINGENV", "PakArbiApp", "parkiran", r))
+}
+
+//Register
+package gcf
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/PakArbi/pakarbibackend"
+)
+
+func init() {
+	functions.HTTP("register", Register)
+}
+
+func Register(w http.ResponseWriter, r *http.Request) {
+	// Set CORS headers for the preflight request
+	if r.Method == http.MethodOptions {
+		w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io")
+		w.Header().Set("Access-Control-Allow-Methods", "POST")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,Authorization,Token")
+		w.Header().Set("Access-Control-Max-Age", "3600")
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+	// Set CORS headers for the main request.
+	w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io")
+	fmt.Fprintf(w, pakarbibackend.Register("Mongoenv", "PakArbi", r))
 
 }
+
 
 
 package gcf
@@ -92,7 +154,7 @@ import (
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/PakArbi/backparkir"
+	"github.com/PakArbi/pakarbibackend"
 )
 
 func init() {
@@ -102,7 +164,7 @@ func init() {
 func CodeQR(w http.ResponseWriter, r *http.Request) {
 	// Set CORS headers for the preflight request
 	if r.Method == http.MethodOptions {
-		w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io/tester, pakarbi.vaidiq.me/tester")
+		w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io, pakarbi.vaidiq.me")
 		w.Header().Set("Access-Control-Allow-Methods", "POST")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,Authorization,Token")
 		w.Header().Set("Access-Control-Max-Age", "3600")
@@ -110,8 +172,38 @@ func CodeQR(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Set CORS headers for the main request.
-	w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io/tester, pakarbi.vaidiq.me/tester")
-	fmt.Fprintf(w, backparkir.GCFPostParkiran("MONGOCONNSTRINGENV", "PakArbi", "CodeQR", r))
+	w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io, pakarbi.vaidiq.me")
+	fmt.Fprintf(w, pakarbibackend.GCFInsertParkiranEmail("publickey","MONGOCONNSTRINGENV", "PakArbi", "user","parkiran", r))
+
+}
+
+package gcf
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/PakArbi/goqrcode"
+)
+
+func init() {
+	functions.HTTP("post", CodeQR)
+}
+
+func CodeQR(w http.ResponseWriter, r *http.Request) {
+	// Set CORS headers for the preflight request
+	if r.Method == http.MethodOptions {
+		w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io, pakarbi.vaidiq.me")
+		w.Header().Set("Access-Control-Allow-Methods", "POST")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,Authorization,Token")
+		w.Header().Set("Access-Control-Max-Age", "3600")
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+	// Set CORS headers for the main request.
+	w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io, pakarbi.vaidiq.me")
+	fmt.Fprintf(w, pakarbibackend.GCFInsertParkiranEmail("MONGOCONNSTRINGENV", "PakArbi", "CodeQR", r))
 
 }
 
