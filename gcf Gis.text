@@ -1,0 +1,152 @@
+//insert data Gis
+package petbackPost
+
+import (
+    "fmt"
+    "net/http"
+
+    "github.com/GoogleCloudPlatform/functions-framework-go/functions"
+    "github.com/nugisOrange/petback"
+)
+
+func init() {
+    functions.HTTP("insert", backGCFkPost)
+}
+
+func backGCFkPost(w http.ResponseWriter, r *http.Request) {
+    // Set CORS headers for the preflight request
+    if r.Method == http.MethodOptions {
+        w.Header().Set("Access-Control-Allow-Origin", "https://nugisorange.github.io")
+        w.Header().Set("Access-Control-Allow-Methods", "POST")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type,Authorization,Token")
+        w.Header().Set("Access-Control-Max-Age", "3600")
+        w.WriteHeader(http.StatusNoContent)
+        return
+    }
+    // Set CORS headers for the main request.
+    w.Header().Set("Access-Control-Allow-Origin", "https://nugisorange.github.io")
+    fmt.Fprintf(w, petback.GCFPostCoordinate("Mongostring", "petasal", "post", r))
+
+}
+
+//update data gis
+package petbackPost
+
+import (
+    "fmt"
+    "net/http"
+
+    "github.com/GoogleCloudPlatform/functions-framework-go/functions"
+    "github.com/nugisOrange/petback"
+)
+
+func init() {
+    functions.HTTP("insert", backGCFkPost)
+}
+
+func backGCFkPost(w http.ResponseWriter, r *http.Request) {
+    // Set CORS headers for the preflight request
+    if r.Method == http.MethodOptions {
+        w.Header().Set("Access-Control-Allow-Origin", "https://nugisorange.github.io")
+        w.Header().Set("Access-Control-Allow-Methods", "PUT")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type,Authorization,Token")
+        w.Header().Set("Access-Control-Max-Age", "3600")
+        w.WriteHeader(http.StatusNoContent)
+        return
+    }
+    // Set CORS headers for the main request.
+    w.Header().Set("Access-Control-Allow-Origin", "https://nugisorange.github.io")
+    fmt.Fprintf(w, petback.GCFPostCoordinate("Mongostring", "petasal", "post", r))
+
+}
+
+package gcf
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/nugisOrange/backendgcf"
+)
+
+func init() {
+	functions.HTTP("put", pasetoPost)
+}
+
+func pasetoPost(w http.ResponseWriter, r *http.Request) {
+	// Set CORS headers for the preflight request
+	if r.Method == http.MethodOptions {
+		w.Header().Set("Access-Control-Allow-Origin", "https://nugisorange.github.io")
+		w.Header().Set("Access-Control-Allow-Methods", "PUT")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,Authorization,Token, Login")
+		w.Header().Set("Access-Control-Max-Age", "3600")
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+	// Set CORS headers for the main request.
+	w.Header().Set("Access-Control-Allow-Origin", "https://nugisorange.github.io")
+	fmt.Fprintf(w, backendgcp.GCFUpdateNameGeojson("publickey", "Mongostring", "gis", "post", r))
+
+}
+
+package gcf
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/nugisOrange/petback"
+)
+
+func init() {
+	functions.HTTP("post", pasetoPost)
+}
+
+func pasetoPost(w http.ResponseWriter, r *http.Request) {
+	// Set CORS headers for the preflight request
+	if r.Method == http.MethodOptions {
+		w.Header().Set("Access-Control-Allow-Origin", "https://nugisorange.github.io")
+		w.Header().Set("Access-Control-Allow-Methods", "POST")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,Authorization,Token")
+		w.Header().Set("Access-Control-Max-Age", "3600")
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+	// Set CORS headers for the main request.
+	w.Header().Set("Access-Control-Allow-Origin", "https://nugisorange.github.io")
+	fmt.Fprintf(w, petback.Register("PublicKey","MongoEnv", "gischap04", "user" r))
+
+}
+
+
+//delete data gispackage petbackPost
+
+import (
+    "fmt"
+    "net/http"
+
+    "github.com/GoogleCloudPlatform/functions-framework-go/functions"
+    "github.com/nugisOrange/petback"
+)
+
+func init() {
+    functions.HTTP("insert", backGCFkPost)
+}
+
+func backGCFkPost(w http.ResponseWriter, r *http.Request) {
+    // Set CORS headers for the preflight request
+    if r.Method == http.MethodOptions {
+        w.Header().Set("Access-Control-Allow-Origin", "https://nugisorange.github.io")
+        w.Header().Set("Access-Control-Allow-Methods", "POST")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type,Authorization,Token")
+        w.Header().Set("Access-Control-Max-Age", "3600")
+        w.WriteHeader(http.StatusNoContent)
+        return
+    }
+    // Set CORS headers for the main request.
+    w.Header().Set("Access-Control-Allow-Origin", "https://nugisorange.github.io")
+    fmt.Fprintf(w, petback.GCFPostCoordinate("Mongostring", "petasal", "post", r))
+
+}

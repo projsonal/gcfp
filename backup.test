@@ -1,0 +1,769 @@
+// // GenerateQRCodeLogoBase64 generates QR code with logo and inserts data into MongoDB
+// func GenerateQRCodeLogoBase64(mconn *mongo.Database, collparkiran string, dataparkiran Parkiran) (string, error) {
+// 	// Insert Parkiran data into MongoDB
+// 	insertParkiran(mconn, collparkiran, dataparkiran)
+
+// 	// Convert struct to JSON
+// 	dataJSON, err := json.Marshal(dataparkiran)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to marshal JSON: %v", err)
+// 	}
+
+// 	// Generate QR code
+// 	qrCode, err := qrcode.Encode(string(dataJSON), qrcode.Medium, 256)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to generate QR code: %v", err)
+
+// 	}
+// 	// Create an image from the QR code
+// 	qrImage, err := imaging.Decode(bytes.NewReader(qrCode))
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to decode QR code image: %v", err)
+// 	}
+
+// 	// Open the ULBI logo file from the "qrcode" folder
+// 	logoFilePath := filepath.Join("qrcode", "logo_ulbi.png")
+// 	logoBase64, err := ImageToBase64(logoFilePath)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to convert logo to base64: %v", err)
+// 	}
+
+// 	// Insert QR code data into MongoDB
+// 	err = InsertQRCodeDataToMongoDB(mconn, "qrcodes", dataparkiran.Parkiranid, qrCode)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to insert QR code data to MongoDB: %v", err)
+// 	}
+
+// 	// Decode the ULBI logo
+// 	logo, _, err := image.Decode(base64.NewDecoder(base64.StdEncoding, strings.NewReader(logoBase64)))
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to decode logo image: %v", err)
+// 	}
+
+// 	// Resize the logo to fit within the QR code
+// 	resizedLogo := resize.Resize(80, 0, logo, resize.Lanczos3)
+
+// 	// Calculate position to overlay the logo on the QR code
+// 	x := (qrImage.Bounds().Dx() - resizedLogo.Bounds().Dx()) / 2
+// 	y := (qrImage.Bounds().Dy() - resizedLogo.Bounds().Dy()) / 2
+
+// 	// Draw the logo onto the QR code
+// 	result := imaging.Overlay(qrImage, resizedLogo, image.Pt(x, y), 1.0)
+
+// 	// Encode QR code data as Base64
+//     qrCodeBase64 := base64.StdEncoding.EncodeToString(qrCode)
+
+//     // Save the final QR code data into MongoDB
+//     err = InsertQRCodeDataToMongoDB(mconn, "qrcodes", dataparkiran.Parkiranid, []byte(qrCodeBase64))
+//     if err != nil {
+//         return "", fmt.Errorf("failed to insert QR code data to MongoDB: %v", err)
+//     }
+
+// 	// Encode the final image into base64
+// 	var base64String string
+// 	base64Writer := &bytes.Buffer{} // Use a buffer instead of base64.NewEncoder
+// 	err = imaging.Encode(base64Writer, result, imaging.PNG)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to encode image: %v", err)
+// 	}
+
+// 	// Get the base64 representation as a string
+// 	base64String = strings.TrimSpace(base64Writer.String())
+
+// 	// Insert data into MongoDB collection along with base64 image data
+// 	dataparkiran.Base64Image = base64String
+// 	insertParkiran(mconn, collparkiran, dataparkiran) // Use insertParkiran2 for Parkiran2 type
+
+// 	return fileName, nil
+// }
+
+
+
+// func GenerateQRCodeLogoBase64(mconn *mongo.Database, collparkiran string, dataparkiran Parkiran) (string, error) {
+
+// 	// Convert struct to JSON
+// 	dataJSON, err := json.Marshal(dataparkiran)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to marshal JSON: %v", err)
+// 	}
+
+// 	// Replace invalid UTF-8 characters
+// 	dataJSON = []byte(replaceInvalidUTF8(string(dataJSON)))
+
+// 	// Ensure the dataJSON is valid UTF-8 encoded
+// 	if !utf8.Valid(dataJSON) {
+// 		return "", fmt.Errorf("data contains invalid UTF-8 characters")
+// 	}
+
+// 	// Insert Parkiran data into MongoDB
+// 	insertParkiran(mconn, collparkiran, Parkiran{
+// 		Parkiranid:     dataparkiran.Parkiranid,
+// 		Nama:           dataparkiran.Nama,
+// 		NPM:            dataparkiran.NPM,
+// 		Prodi:          dataparkiran.Prodi,
+// 		NamaKendaraan:  dataparkiran.NamaKendaraan,
+// 		NomorKendaraan: dataparkiran.NomorKendaraan,
+// 		JenisKendaraan: dataparkiran.JenisKendaraan,
+// 		Status:         dataparkiran.Status,
+// 	})
+
+// 	// Generate QR code
+// 	qrCode, err := qrcode.Encode(string(dataJSON), qrcode.Medium, 256)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to generate QR code: %v", err)
+// 	}
+
+// 	// Open the ULBI logo file from the "qrcode" folder
+// 	logoFilePath := filepath.Join("qrcode", "logo_ulbi.png")
+// 	logoBase64, err := ImageToBase64(logoFilePath)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to convert logo to base64: %v", err)
+// 	}
+
+// 	// Decode the ULBI logo
+// 	logo, _, err := image.Decode(base64.NewDecoder(base64.StdEncoding, strings.NewReader(logoBase64)))
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to decode logo image: %v", err)
+// 	}
+
+// 	// Resize the logo to fit within the QR code
+// 	resizedLogo := resize.Resize(80, 0, logo, resize.Lanczos3)
+
+// 	// Create an image from the QR code
+// 	qrImage, err := imaging.Decode(bytes.NewReader(qrCode))
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to decode QR code image: %v", err)
+// 	}
+
+// 	// Calculate position to overlay the logo on the QR code
+// 	x := (qrImage.Bounds().Dx() - resizedLogo.Bounds().Dx()) / 2
+// 	y := (qrImage.Bounds().Dy() - resizedLogo.Bounds().Dy()) / 2
+
+// 	// Draw the logo onto the QR code
+// 	result := imaging.Overlay(qrImage, resizedLogo, image.Pt(x, y), 1.0)
+
+// 	// Save the final QR code with logo
+// 	fileName := filepath.Join("qrcode", fmt.Sprintf("%s_logo_ulbi_qrcode.png", dataparkiran.Parkiranid))
+// 	outFile, err := os.Create(fileName)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to create output file: %v", err)
+// 	}
+// 	defer outFile.Close()
+
+// 	// Encode the final image into base64
+// 	var base64String string
+// 	base64Writer := &bytes.Buffer{} // Use a buffer instead of base64.NewEncoder
+// 	err = imaging.Encode(base64Writer, result, imaging.PNG)
+// 	if err != nil {
+// 	return "", fmt.Errorf("failed to encode image: %v", err)
+// 	}
+
+// 	// Convert base64 data to JSON string
+// 	base64Data := base64Writer.Bytes()
+// 	jsonString, err := json.Marshal(map[string]interface{}{"base64Image": base64.StdEncoding.EncodeToString(base64Data)})
+// 	if err != nil {
+// 	return "", fmt.Errorf("failed to convert base64 to JSON string: %v", err)
+// 	}
+
+// 	// Use jsonString as needed, for example, inserting into MongoDB
+// 	err = InsertQRCodeDataToMongoDB(mconn, "qrcodes", dataparkiran.Parkiranid, []byte(jsonString))
+// 	if err != nil {
+// 	return "", fmt.Errorf("failed to insert QR code data to MongoDB: %v", err)
+// 	}
+
+// // Get the base64 representation as a string
+// base64String = strings.TrimSpace(string(jsonString))
+
+// 	// Insert QR code data into MongoDB
+// 	err = InsertQRCodeDataToMongoDB(mconn, "qrcodes", dataparkiran.Parkiranid, []byte(base64String))
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to insert QR code data to MongoDB: %v", err)
+// 	}
+
+// 	// Update Parkiran data with Base64 image
+// 	update := bson.D{{Key: "$set", Value: bson.D{{Key: "data.base64Image", Value: base64String}}}}
+// 	_, err = mconn.Collection(collparkiran).UpdateOne(context.TODO(), bson.M{"parkiranid": dataparkiran.Parkiranid}, update)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to update Parkiran data with Base64 image: %v", err)
+// 	}
+
+// 	return fileName, nil
+// }
+
+
+
+
+// func GenerateQRCodeLogoBase64(mconn *mongo.Database, collparkiran string, dataparkiran Parkiran) (string, error) {
+// 	// Convert struct to JSON
+// 	dataJSON, err := json.Marshal(dataparkiran)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to marshal JSON: %v", err)
+// 	}
+
+// 	Ensure the dataJSON is valid UTF-8 encoded
+// 	if !utf8.Valid(dataJSON) {
+// 		return "", fmt.Errorf("data contains invalid UTF-8 characters")
+// 	}
+
+// 	// Generate QR code
+// 	qrCode, err := qrcode.Encode(string(dataJSON), qrcode.Medium, 256)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to generate QR code: %v", err)
+// 	}
+
+// 	// Open the ULBI logo file from the "qrcode" folder
+// 	logoFilePath := filepath.Join("qrcode", "logo_ulbi.png")
+// 	logoBase64, err := ImageToBase64(logoFilePath)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to convert logo to base64: %v", err)
+// 	}
+
+// 	// Resize the logo
+// 	resizedLogo, err := resizeLogo(logoBase64)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to resize logo: %v", err)
+// 	}
+
+// 	// Create an image from the QR code
+// 	qrImage, err := imaging.Decode(bytes.NewReader(qrCode))
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to decode QR code image: %v", err)
+// 	}
+
+// 	// Calculate position to overlay the logo on the QR code
+// 	x := (qrImage.Bounds().Dx() - resizedLogo.Bounds().Dx()) / 2
+// 	y := (qrImage.Bounds().Dy() - resizedLogo.Bounds().Dy()) / 2
+
+// 	// Draw the logo onto the QR code
+// 	result := imaging.Overlay(qrImage, resizedLogo, image.Pt(x, y), 1.0)
+
+// 	// Save the final QR code with logo
+// 	fileName := filepath.Join("qrcode", fmt.Sprintf("%s_qrcodes.png", dataparkiran.Parkiranid))
+// 	err = saveImage(result, fileName)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to save image: %v", err)
+// 	}
+
+// 	// Convert the final image to base64
+// 	finalImageBase64, err := ImageToBase64(fileName)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to convert final image to base64: %v", err)
+// 	}
+
+// 	// Insert QR code data into MongoDB
+// 	err = InsertQRCodeDataToMongoDB(mconn, "qrcodes", dataparkiran.Parkiranid, []byte(finalImageBase64))
+// 	if err != nil {
+// 		return "", fmt.Errorf("gagal memasukkan data QR code ke MongoDB: %v", err)
+// 	}
+
+// 	Update data Parkiran dengan gambar Base64
+// 	update := bson.D{{Key: "$set", Value: bson.D{{Key: "base64Image", Value: finalImageBase64}}}}
+// 	_, err = mconn.Collection(collparkiran).UpdateOne(context.TODO(), bson.M{"parkiranid": dataparkiran.Parkiranid}, update)
+// 	if err != nil {
+// 		return "", fmt.Errorf("gagal memperbarui data Parkiran dengan gambar Base64: %v", err)
+// 	}
+
+// 	// Generate gambar dari data base64
+// 	imageFileName := filepath.Join("qrcode", fmt.Sprintf("%s_imageQrCode.png", dataparkiran.Parkiranid))
+// 	_, err = GenerateImageFromBase64(finalImageBase64, imageFileName)
+// 	if err != nil {
+// 		return "", fmt.Errorf("gagal menghasilkan gambar dari data base64: %v", err)
+// 	}
+
+// 	return fileName, nil
+// }
+
+
+// func GenerateQRCodeWithLogo(mconn *mongo.Database, dataparkiran Parkiran) (string, error) {
+// 	// Convert struct to JSON
+// 	dataJSON, err := json.Marshal(dataparkiran)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to marshal JSON: %v", err)
+// 	}
+
+// 	// Generate QR code
+// 	qrCode, err := qrcode.Encode(string(dataJSON), qrcode.Medium, 256)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to generate QR code: %v", err)
+// 	}
+
+// 	// Create an image from the QR code
+// 	qrImage, err := imaging.Decode(bytes.NewReader(qrCode))
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to decode QR code image: %v", err)
+// 	}
+
+// 	// Open the ULBI logo file
+// 	logoFile, err := os.Open("logo_ulbi.png") // Replace with your ULBI logo file path
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to open logo file: %v", err)
+// 	}
+// 	defer logoFile.Close()
+
+// 	// Decode the ULBI logo
+// 	logo, _, err := image.Decode(logoFile)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to decode logo image: %v", err)
+// 	}
+
+// 	// Resize the logo to fit within the QR code
+// 	resizedLogo := imaging.Resize(logo, 80, 0, imaging.Lanczos)
+
+// 	// Calculate position to overlay the logo on the QR code
+// 	x := (qrImage.Bounds().Dx() - resizedLogo.Bounds().Dx()) / 2
+// 	y := (qrImage.Bounds().Dy() - resizedLogo.Bounds().Dy()) / 2
+
+// 	// Draw the logo onto the QR code
+// 	result := imaging.Overlay(qrImage, resizedLogo, image.Pt(x, y), 1.0)
+
+// 	// Save the final QR code with logo
+// 	fileName := dataparkiran.Parkiranid + "_qrcode.png" // Using Parkiran ID in the file name
+// 	outFile, err := os.Create(fileName)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to create output file: %v", err)
+// 	}
+// 	defer outFile.Close()
+
+// 	// Encode the final image into the output file
+// 	err = imaging.Encode(outFile, result, imaging.PNG)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to encode image: %v", err)
+// 	}
+
+// 	return fileName, nil
+// }
+
+// func GenerateQRCodeWithLogo(mconn *mongo.Database, dataparkiran Parkiran) (string, error) {
+// 	// Convert struct to JSON
+// 	dataJSON, err := json.Marshal(dataparkiran)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to marshal JSON: %v", err)
+// 	}
+
+// 	// Generate QR code
+// 	qrCode, err := qrcode.Encode(string(dataJSON), qrcode.Medium, 256)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to generate QR code: %v", err)
+// 	}
+
+// 	// Create an image from the QR code
+// 	qrImage, err := imaging.Decode(bytes.NewReader(qrCode))
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to decode QR code image: %v", err)
+// 	}
+
+// 	// // Open the ULBI logo file from the "qrcode" folder
+// 	// logoFile, err := os.Open("qrcode/logo_ulbi.png") // Replace with your ULBI logo file path
+// 	// if err != nil {
+// 	// 	return "", fmt.Errorf("failed to open logo file: %v", err)
+// 	// }
+// 	// defer logoFile.Close()
+
+// 	// Open the ULBI logo file from the "qrcode" folder
+// 	logoFilePath := filepath.Join("qrcode", "logo_ulbi.png")
+// 	logoFile, err := os.Open(logoFilePath)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to open logo file: %v", err)
+// 	}
+// 	defer logoFile.Close()
+
+// 	// Get the base name of the ULBI logo file
+// 	// logoBaseName := path.Base(logoFile.Name())
+
+// 	// Decode the ULBI logo
+// 	logo, _, err := image.Decode(logoFile)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to decode logo image: %v", err)
+// 	}
+
+// 	// Resize the logo to fit within the QR code
+// 	resizedLogo := resize.Resize(80, 0, logo, resize.Lanczos3)
+
+// 	// Calculate position to overlay the logo on the QR code
+// 	x := (qrImage.Bounds().Dx() - resizedLogo.Bounds().Dx()) / 2
+// 	y := (qrImage.Bounds().Dy() - resizedLogo.Bounds().Dy()) / 2
+
+// 	// Draw the logo onto the QR code
+// 	result := imaging.Overlay(qrImage, resizedLogo, image.Pt(x, y), 1.0)
+
+// 	// Save the final QR code with logo
+// 	// Save the final QR code with logo
+// 	fileName := filepath.Join("qrcode", fmt.Sprintf("%s_logo_ulbi_qrcode.png", dataparkiran.Parkiranid))
+// 	outFile, err := os.Create(fileName)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to create output file: %v", err)
+// 	}
+// 	defer outFile.Close()
+
+// 	// Encode the final image into the output file
+// 	err = imaging.Encode(outFile, result, imaging.PNG)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to encode image: %v", err)
+// 	}
+
+// 	return fileName, nil
+// }
+
+
+//proses untuk generate code qr
+// func TestGenerateQRCodeWithLogo(t *testing.T) {
+//     // Initialize your MongoDB connection here
+//     mconn := SetConnection("MONGOSTRING", "PakArbiApp")
+
+//     // Initialize a sample Parkiran struct for testing
+//     dataparkiran := Parkiran{
+//         Parkiranid:     "D3/D412345", // Use the same value as in the expectation
+//         Nama:           "John Doe",
+//         NPM:            "12345",     //
+//         Prodi:          "Computer Science",
+//         NamaKendaraan:  "Car",
+//         NomorKendaraan: "AB 1234 CD",
+//         JenisKendaraan: "Sedan",
+//         Status: Status{
+//             Message:    "sudah masuk Parkir",
+//             WaktuMasuk: time.Now().Format(time.RFC3339),
+//         },
+//     }
+
+//     fileName, err := GenerateQRCodeWithLogo(mconn, dataparkiran)
+//     if err != nil {
+//         t.Errorf("Error generating QR code: %v", err)
+//         return
+//     }
+
+//     if fileName != "qrcode/D3/D412345_qrcode.png" {
+//         t.Errorf("Expected file name 'qrcode/D3/D412345_qrcode.png', got '%s'", fileName)
+//         return
+//     }
+
+//     t.Log("Berhasil generate code qr")
+// }
+
+// func TestGenerateQRCodeWithLogo(t *testing.T) {
+//     // Set up your MongoDB connection
+//     mconn := SetConnection("MONGOSTRING", "PakArbiApp")
+
+//     // Set up a sample Parkiran struct for testing
+//     dataparkiran := Parkiran{
+//         Parkiranid:     "D31214000",
+//         Nama:           "John Doe",
+//         NPM:            "12345",
+//         Prodi:          "Computer Science",
+//         NamaKendaraan:  "Car",
+//         NomorKendaraan: "AB 1234 CD",
+//         JenisKendaraan: "Sedan",
+//         Status: Status{
+//             Message:    "sudah masuk Parkir",
+//             WaktuMasuk: time.Now().Format(time.RFC3339),
+//         },
+//     }
+
+//     // Generate QR code with logo
+//     fileName, err := GenerateQRCodeWithLogo(mconn, dataparkiran)
+//     if err != nil {
+//         t.Errorf("Error generating QR code: %v", err)
+//         return
+//     }
+
+//     // Check if the generated file exists
+//     if _, err := os.Stat(fileName); os.IsNotExist(err) {
+//         t.Errorf("Expected file '%s' not found", fileName)
+//         return
+//     }
+
+//     // Check if the file name follows the expected pattern
+//     expectedFileName := filepath.Base(dataparkiran.Parkiranid + "_logo_ulbi_qrcode.png")
+//     if fileName != expectedFileName {
+//         t.Errorf("Expected file name '%s', got '%s'", expectedFileName, fileName)
+//         return
+//     }
+
+//     t.Log("Successfully generated QR code with logo")
+// }
+
+
+// func GCFInsertParkiranNPM2(publickey, MONGOCONNSTRINGENV, dbname, colluser, collparkiran string, r *http.Request) string {
+// 	var response Credential
+// 	response.Status = false
+// 	mconn := SetConnection(MONGOCONNSTRINGENV, dbname)
+// 	var userdata User
+// 	gettoken := r.Header.Get("Login")
+// 	if gettoken == "" {
+// 		response.Message = "Header Login Not Exist"
+// 	} else {
+// 		// Process the request with the "Login" token
+// 		checktoken := watoken.DecodeGetId(os.Getenv(publickey), gettoken)
+// 		userdata.NPM = checktoken
+// 		if checktoken == "" {
+// 			response.Message = "Kamu kayaknya belum punya akun"
+// 		} else {
+// 			user2 := FindUserNPM(mconn, colluser, userdata)
+// 			if user2.Role == "user" {
+// 				var dataparkiran Parkiran
+// 				err := json.NewDecoder(r.Body).Decode(&dataparkiran)
+// 				if err != nil {
+// 					response.Message = "Error parsing application/json: " + err.Error()
+// 				} else {
+// 					// Create auto-incremented Parkiran ID
+// 					parkiranID, err := createParkiranID(mconn)
+// 					if err != nil {
+// 						response.Message = "Error creating Parkiran ID: " + err.Error()
+// 					} else {
+// 						// Assign auto-incremented ID to dataparkiran
+// 						dataparkiran.Parkiranid = parkiranID
+
+// 						// Insert Parkiran data
+// 						insertParkiran(mconn, collparkiran, dataparkiran)
+
+// 						// Generate QR code with logo and base64 encoding
+// 						_, err := GenerateQRCodeLogoBase64(mconn, collparkiran, dataparkiran)
+// 						if err != nil {
+// 							response.Message = "Error generating QR code: " + err.Error()
+// 						} else {
+// 							response.Status = true
+// 							response.Message = "Berhasil Insert Data Parkiran dan Generate QR Code"
+// 						}
+// 					}
+// 				}
+// 			} else {
+// 				response.Message = "Anda tidak dapat Insert data karena bukan user"
+// 			}
+// 		}
+// 	}
+// 	return GCFReturnStruct(response)
+// }
+
+// func GCFInsertParkiranEmail2(publickey, MONGOCONNSTRINGENV, dbname, colluser, collparkiran string, r *http.Request) string {
+// 	var response Credential
+// 	response.Status = false
+// 	mconn := SetConnection(MONGOCONNSTRINGENV, dbname)
+// 	var userdata User
+// 	gettoken := r.Header.Get("Login")
+// 	if gettoken == "" {
+// 		response.Message = "Header Login Not Exist"
+// 	} else {
+// 		// Process the request with the "Login" token
+// 		checktoken := watoken.DecodeGetId(os.Getenv(publickey), gettoken)
+// 		userdata.NPM = checktoken
+// 		if checktoken == "" {
+// 			response.Message = "Kamu kayaknya belum punya akun"
+// 		} else {
+// 			user2 := FindUserEmail(mconn, colluser, userdata)
+// 			if user2.Role == "user" {
+// 				var dataparkiran Parkiran
+// 				err := json.NewDecoder(r.Body).Decode(&dataparkiran)
+// 				if err != nil {
+// 					response.Message = "Error parsing application/json: " + err.Error()
+// 				} else {
+// 					// Create auto-incremented Parkiran ID
+// 					parkiranID, err := createParkiranID(mconn)
+// 					if err != nil {
+// 						response.Message = "Error creating Parkiran ID: " + err.Error()
+// 					} else {
+// 						// Assign auto-incremented ID to dataparkiran
+// 						dataparkiran.Parkiranid = parkiranID
+
+// 						// Insert Parkiran data
+// 						insertParkiran(mconn, collparkiran, dataparkiran)
+
+// 						// Generate QR code with logo and base64 encoding
+// 						_, err := GenerateQRCodeLogoBase64(mconn, collparkiran, dataparkiran)
+// 						if err != nil {
+// 							response.Message = "Error generating QR code: " + err.Error()
+// 						} else {
+// 							response.Status = true
+// 							response.Message = "Berhasil Insert Data Parkiran dan Generate QR Code"
+// 						}
+// 					}
+// 				}
+// 			} else {
+// 				response.Message = "Anda tidak dapat Insert data karena bukan user"
+// 			}
+// 		}
+// 	}
+// 	return GCFReturnStruct(response)
+// }
+
+// func GCFInsertParkiranNPM2(publickey, MONGOCONNSTRINGENV, dbname, colluser, collparkiran string, r *http.Request) string {
+// 	var response Credential
+// 	response.Status = false
+// 	mconn := SetConnection(MONGOCONNSTRINGENV, dbname)
+// 	var userdata User
+// 	gettoken := r.Header.Get("Login")
+// 	if gettoken == "" {
+// 		response.Message = "Header Login Not Exist"
+// 	} else {
+// 		// Process the request with the "Login" token
+// 		checktoken := watoken.DecodeGetId(os.Getenv(publickey), gettoken)
+// 		userdata.NPM = checktoken
+// 		if checktoken == "" {
+// 			response.Message = "Kamu kayaknya belum punya akun"
+// 		} else {
+// 			user2 := FindUserNPM(mconn, colluser, userdata)
+// 			if user2.Role == "user" {
+// 				var dataparkiran Parkiran
+// 				err := json.NewDecoder(r.Body).Decode(&dataparkiran)
+// 				if err != nil {
+// 					response.Message = "Error parsing application/json: " + err.Error()
+// 				} else {
+// 					insertParkiran(mconn, collparkiran, Parkiran{
+// 						Parkiranid:     dataparkiran.Parkiranid,
+// 						Nama:           dataparkiran.Nama,
+// 						NPM:            dataparkiran.NPM,
+// 						Prodi:          dataparkiran.Prodi,
+// 						NamaKendaraan:  dataparkiran.NamaKendaraan,
+// 						NomorKendaraan: dataparkiran.NomorKendaraan,
+// 						JenisKendaraan: dataparkiran.JenisKendaraan,
+// 						Status:         dataparkiran.Status,
+// 					})
+// 					// Generate QR code with logo and base64 encoding
+//                     _, err := GenerateQRCodeLogoBase64(mconn, collparkiran, dataparkiran)
+//                     if err != nil {
+//                         response.Message = "Error generating QR code: " + err.Error()
+//                     } else {
+//                         response.Status = true
+//                         response.Message = "Berhasil Insert Data Parkiran dan Generate QR Code"
+//                     }
+// 				}
+// 			} else {
+// 				response.Message = "Anda tidak dapat Insert data karena bukan user"
+// 			}
+// 		}
+// 	}
+// 	return GCFReturnStruct(response)
+// }
+
+// func GCFInsertParkiranEmail2(publickey, MONGOCONNSTRINGENV, dbname, colluser, collparkiran string, r *http.Request) string {
+// 	var response Credential
+// 	response.Status = false
+// 	mconn := SetConnection(MONGOCONNSTRINGENV, dbname)
+// 	var userdata User
+// 	gettoken := r.Header.Get("Login")
+// 	if gettoken == "" {
+// 		response.Message = "Header Login Not Exist"
+// 	} else {
+// 		// Process the request with the "Login" token
+// 		checktoken := watoken.DecodeGetId(os.Getenv(publickey), gettoken)
+// 		userdata.NPM = checktoken
+// 		if checktoken == "" {
+// 			response.Message = "Kamu kayaknya belum punya akun"
+// 		} else {
+// 			user2 := FindUserEmail(mconn, colluser, userdata)
+// 			if user2.Role == "user" {
+// 				var dataparkiran Parkiran
+// 				err := json.NewDecoder(r.Body).Decode(&dataparkiran)
+// 				if err != nil {
+// 					response.Message = "Error parsing application/json: " + err.Error()
+// 				} else {
+// 					insertParkiran(mconn, collparkiran, Parkiran{
+// 						Parkiranid:     dataparkiran.Parkiranid,
+// 						Nama:           dataparkiran.Nama,
+// 						NPM:            dataparkiran.NPM,
+// 						Prodi:          dataparkiran.Prodi,
+// 						NamaKendaraan:  dataparkiran.NamaKendaraan,
+// 						NomorKendaraan: dataparkiran.NomorKendaraan,
+// 						JenisKendaraan: dataparkiran.JenisKendaraan,
+// 						Status:         dataparkiran.Status,
+// 					})
+// 					// Generate QR code with logo and base64 encoding
+//                     _, err := GenerateQRCodeLogoBase64(mconn, collparkiran, dataparkiran)
+//                     if err != nil {
+//                         response.Message = "Error generating QR code: " + err.Error()
+//                     } else {
+//                         response.Status = true
+//                         response.Message = "Berhasil Insert Data Parkiran dan Generate QR Code"
+//                     }
+// 				}
+// 			} else {
+// 				response.Message = "Anda tidak dapat Insert data karena bukan user"
+// 			}
+// 		}
+// 	}
+// 	return GCFReturnStruct(response)
+// }
+
+// func GCFInsertParkiranNPM(publickey, MONGOCONNSTRINGENV, dbname, colluser, collparkiran string, r *http.Request) string {
+// 	var response Credential
+// 	response.Status = false
+// 	mconn := SetConnection(MONGOCONNSTRINGENV, dbname)
+// 	var userdata User
+// 	gettoken := r.Header.Get("Login")
+// 	if gettoken == "" {
+// 		response.Message = "Header Login Not Exist"
+// 	} else {
+// 		// Process the request with the "Login" token
+// 		checktoken := watoken.DecodeGetId(os.Getenv(publickey), gettoken)
+// 		userdata.NPM = checktoken
+// 		if checktoken == "" {
+// 			response.Message = "Kamu kayaknya belum punya akun"
+// 		} else {
+// 			user2 := FindUserNPM(mconn, colluser, userdata)
+// 			if user2.Role == "user" {
+// 				var dataparkiran Parkiran
+// 				err := json.NewDecoder(r.Body).Decode(&dataparkiran)
+// 				if err != nil {
+// 					response.Message = "Error parsing application/json: " + err.Error()
+// 				} else {
+// 					insertParkiran(mconn, collparkiran, Parkiran{
+// 						Parkiranid:     dataparkiran.Parkiranid,
+// 						Nama:           dataparkiran.Nama,
+// 						NPM:            dataparkiran.NPM,
+// 						Prodi:          dataparkiran.Prodi,
+// 						NamaKendaraan:  dataparkiran.NamaKendaraan,
+// 						NomorKendaraan: dataparkiran.NomorKendaraan,
+// 						JenisKendaraan: dataparkiran.JenisKendaraan,
+// 						Status:         dataparkiran.Status,
+// 					})
+// 					response.Status = true
+// 					response.Message = "Berhasil Insert Data Parkiran"
+// 				}
+// 			} else {
+// 				response.Message = "Anda tidak dapat Insert data karena bukan user"
+// 			}
+// 		}
+// 	}
+// 	return GCFReturnStruct(response)
+// }
+
+// func GCFInsertParkiranEmail(publickey, MONGOCONNSTRINGENV, dbname, colluser, collparkiran string, r *http.Request) string {
+// 	var response Credential
+// 	response.Status = false
+// 	mconn := SetConnection(MONGOCONNSTRINGENV, dbname)
+// 	var userdata User
+// 	gettoken := r.Header.Get("Login")
+// 	if gettoken == "" {
+// 		response.Message = "Header Login Not Exist"
+// 	} else {
+// 		// Process the request with the "Login" token
+// 		checktoken := watoken.DecodeGetId(os.Getenv(publickey), gettoken)
+// 		userdata.Email = checktoken
+// 		if checktoken == "" {
+// 			response.Message = "Kamu kayaknya belum punya akun"
+// 		} else {
+// 			user2 := FindUserEmail(mconn, colluser, userdata)
+// 			if user2.Role == "user" {
+// 				var dataparkiran Parkiran
+// 				err := json.NewDecoder(r.Body).Decode(&dataparkiran)
+// 				if err != nil {
+// 					response.Message = "Error parsing application/json: " + err.Error()
+// 				} else {
+// 					insertParkiran(mconn, collparkiran, Parkiran{
+// 						Parkiranid:     dataparkiran.Parkiranid,
+// 						Nama:           dataparkiran.Nama,
+// 						NPM:            dataparkiran.NPM,
+// 						Prodi:          dataparkiran.Prodi,
+// 						NamaKendaraan:  dataparkiran.NamaKendaraan,
+// 						NomorKendaraan: dataparkiran.NomorKendaraan,
+// 						JenisKendaraan: dataparkiran.JenisKendaraan,
+// 						Status:         dataparkiran.Status,
+// 					})
+// 					response.Status = true
+// 					response.Message = "Berhasil Insert Data Parkiran"
+// 				}
+// 			} else {
+// 				response.Message = "Anda tidak dapat Insert data karena bukan user"
+// 			}
+// 		}
+// 	}
+// 	return GCFReturnStruct(response)
+// }

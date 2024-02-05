@@ -121,7 +121,7 @@ func PostParkiran(w http.ResponseWriter, r *http.Request) {
 	// Set CORS headers for the main request.
 	w.Header().Set("Access-Control-Allow-Origin", "https://pakarbi.github.io, https://pakarbi.vaidiq.cloud")
 	w.Header().Add("Content-Type", "application/json")
-	fmt.Fprintf(w, pakarbibackend.GCFInsertParkiranNPM("PublicKey", "MONGOCONNSTRINGENV", "PakArbiApp", "user", "parkiran", r))
+	fmt.Fprintf(w, pakarbibackend.GCFInsertParkiranNPM("publickey", "MONGOCONNSTRINGENV", "PakArbiApp", "user", "parkiran", r))
 }
 
 

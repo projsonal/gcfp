@@ -10,3 +10,13 @@ export let URLLogin = `https://asia-southeast2-pakarbi.cloudfunctions.net/loginp
 export let URLLoginEmail = `https://asia-southeast2-pakarbi.cloudfunctions.net/loginpakarbiemail`
 
 export let token = 'token';
+
+
+
+
+// senResponse
+func sendResponse(w http.ResponseWriter, response interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}
